@@ -1,3 +1,5 @@
+//Author: renju vm
+
 package main
 
 import (
@@ -10,7 +12,7 @@ import (
 	"github.com/hyperledger/fabric/core/chaincode/shim"
 )
 
-// CertificateChaincode example simple Chaincode implementation
+// CertificateChaincode certificate verification chaincode
 type CertificateChaincode struct {
 }
 
@@ -22,8 +24,8 @@ type cert struct{
 	Unittitle string `json:"unit_title"`
 	Qualid string `json:"qual_identifier"`
 	Unitid string `json:"unit_identifier"`
-        User string `json:"user_name"`
-        Certificate string `json:"cert_hash"`
+  User string `json:"user_name"`
+  Certificate string `json:"cert_hash"`
 }
 
 type Description struct{
@@ -75,26 +77,26 @@ func (t *CertificateChaincode) Init(stub shim.ChaincodeStubInterface, function s
 	if err != nil {
 		return nil, err
 	}
-	
+
 	var empty []string
 	jsonAsBytes, _ := json.Marshal(empty)								//marshal an emtpy array of strings to clear the index
 	err = stub.PutState(certIndexStr, jsonAsBytes)
 	if err != nil {
 		return nil, err
 	}
-	
+
 	var Transactions AllTransactions
 	jsonAsBytes, _ = json.Marshal(Transactions)								//clear the open transaction struct
 	err = stub.PutState(opentransStr, jsonAsBytes)
 	if err != nil {
 		return nil, err
 	}
-	
+
 	return nil, nil
 }
 
 // ============================================================================================================================
-// Run - Our entry point for Invocations 
+// Run - Our entry point for Invocations
 // ============================================================================================================================
 func (t *CertificateChaincode) Run(stub shim.ChaincodeStubInterface, function string, args []string) ([]byte, error) {
 	fmt.Println("run is running " + function)
@@ -120,7 +122,7 @@ func (t *CertificateChaincode) Invoke(stub shim.ChaincodeStubInterface, function
 		return res, err
 	} else if function == "find_cert" {									//create a new transaction
 		return t.find_cert(stub, args)
-	} 
+	}
 
 	fmt.Println("invoke did not find func: " + function)					//error
 
@@ -161,45 +163,6 @@ func (t *CertificateChaincode) read(stub shim.ChaincodeStubInterface, args []str
 	}
 
 	return valAsbytes, nil													//send it onward
-}
-
-// ============================================================================================================================
-// Delete - remove a key/value pair from state
-// ============================================================================================================================
-func (t *CertificateChaincode) Delete(stub shim.ChaincodeStubInterface, args []string) ([]byte, error) {
-	if len(args) != 1 {
-		return nil, errors.New("Incorrect number of arguments. Expecting 1")
-	}
-	
-	name := args[0]
-	err := stub.DelState(name)													//remove the key from chaincode state
-	if err != nil {
-		return nil, errors.New("Failed to delete state")
-	}
-
-	//get the cert index
-	certsAsBytes, err := stub.GetState(certIndexStr)
-	if err != nil {
-		return nil, errors.New("Failed to get cert index")
-	}
-	var certIndex []string
-	json.Unmarshal(certsAsBytes, &certIndex)								//un stringify it aka JSON.parse()
-	
-	//remove cert from index
-	for i,val := range certIndex{
-		fmt.Println(strconv.Itoa(i) + " - looking at " + val + " for " + name)
-		if val == name{															//find the correct cert
-			fmt.Println("found cert")
-			certIndex = append(certIndex[:i], certIndex[i+1:]...)			//remove it
-			for x:= range certIndex{											//debug prints...
-				fmt.Println(string(x) + " - " + certIndex[x])
-			}
-			break
-		}
-	}
-	jsonAsBytes, _ := json.Marshal(certIndex)									//save new index
-	err = stub.PutState(certIndexStr, jsonAsBytes)
-	return nil, nil
 }
 
 // ============================================================================================================================
@@ -261,7 +224,7 @@ func (t *CertificateChaincode) init_cert(stub shim.ChaincodeStubInterface, args 
 	unitid := strings.ToLower(args[3])
 	user := strings.ToLower(args[4])
 	certificate := strings.ToLower(args[5])
-	
+
 
 	//check if cert already exists
 	certAsBytes, err := stub.GetState(certificate)
@@ -275,14 +238,14 @@ func (t *CertificateChaincode) init_cert(stub shim.ChaincodeStubInterface, args 
 		fmt.Println(res);
 		return nil, errors.New("This certificate arleady exists")				//all stop a cert by this name exists
 	}
-	
+
 	//build the cert json string manually
 	str := `{"owner": "` + owner + `", "unittitle": "` + unittitle + `", "qualid": "` + qualid + `", "unitid": "` + unitid + `", "user": "` + user + `", "certificate": "` + certificate + `"}`
 	err = stub.PutState(name, []byte(str))									//store cert with id as key
 	if err != nil {
 		return nil, err
 	}
-		
+
 	//get the cert index
 	certsAsBytes, err := stub.GetState(certIndexStr)
 	if err != nil {
@@ -290,7 +253,7 @@ func (t *CertificateChaincode) init_cert(stub shim.ChaincodeStubInterface, args 
 	}
 	var certIndex []string
 	json.Unmarshal(certsAsBytes, &certIndex)							//un stringify it aka JSON.parse()
-	
+
 	//append
 	certIndex = append(certIndex, name)									//add cert name to index list
 	fmt.Println("! cert index: ", certIndex)
@@ -306,13 +269,13 @@ func (t *CertificateChaincode) init_cert(stub shim.ChaincodeStubInterface, args 
 // ============================================================================================================================
 func (t *CertificateChaincode) set_user(stub shim.ChaincodeStubInterface, args []string) ([]byte, error) {
 	var err error
-	
+
 	//   0       1
 	// "name", "renju"
 	if len(args) < 2 {
 		return nil, errors.New("Incorrect number of arguments. Expecting 2")
 	}
-	
+
 	fmt.Println("- start set user")
 	fmt.Println(args[0] + " - " + args[1])
 	certAsBytes, err := stub.GetState(args[0])
@@ -322,13 +285,13 @@ func (t *CertificateChaincode) set_user(stub shim.ChaincodeStubInterface, args [
 	res := cert{}
 	json.Unmarshal(certAsBytes, &res)										//un stringify it aka JSON.parse()
 	res.User = args[1]														//change the user
-	
+
 	jsonAsBytes, _ := json.Marshal(res)
 	err = stub.PutState(args[0], jsonAsBytes)								//rewrite the cert with id as key
 	if err != nil {
 		return nil, err
 	}
-	
+
 	fmt.Println("- end set user")
 	return nil, nil
 }
@@ -349,11 +312,11 @@ func (t *CertificateChaincode) find_cert(stub shim.ChaincodeStubInterface, args 
 
 	//get the cert index
 	certsAsBytes, err := stub.GetState(certIndexStr)
-	
+
 	var certIndex []string
-	json.Unmarshal(certsAsBytes, &certIndex)								
-	
-	for i:= range certIndex{													
+	json.Unmarshal(certsAsBytes, &certIndex)
+
+	for i:= range certIndex{
 		//fmt.Println("looking @ cert name: " + certIndex[i]);
 
 		certAsBytes, err := stub.GetState(certIndex[i])						//grab this cert
@@ -362,16 +325,16 @@ func (t *CertificateChaincode) find_cert(stub shim.ChaincodeStubInterface, args 
 		}
 		res := cert{}
 		json.Unmarshal(certAsBytes, &res)										//un stringify it aka JSON.parse()
-		
-		
+
+
 		//check for user && certificate
 		if strings.ToLower(res.User) == strings.ToLower(args[0]) && strings.ToLower(res.Certificate) == strings.ToLower(args[1]){
 			fmt.Println("found a Certificate issued by: " + res.Owner)
 			fmt.Println("! end find Certificate")
 			jsonAsBytes, _ := json.Marshal(res)
-	
+
 			err = stub.PutState(args[0], jsonAsBytes)								//rewrite the cert with id as key
-	
+
 		}
 	}
 	if err != nil {
@@ -379,7 +342,7 @@ func (t *CertificateChaincode) find_cert(stub shim.ChaincodeStubInterface, args 
 	}
 	
 	fmt.Println("- end find Certificate - error")
-	
+
 	return nil, nil
 }
 
@@ -389,5 +352,3 @@ func (t *CertificateChaincode) find_cert(stub shim.ChaincodeStubInterface, args 
 func makeTimestamp() int64 {
     return time.Now().UnixNano() / (int64(time.Millisecond)/int64(time.Nanosecond))
 }
-
-
