@@ -19,7 +19,7 @@ type CertificateChaincode struct {
 var certIndexStr = "_certindex"				//name for the key/value that will store a list of all known certs
 var opentransStr = "_opentrans"				//name for the key/value that will store all certificates
 
-type Cert struct{
+type cert struct{
 	Owner string `json:"owner_name"`					//the fieldtags are needed to keep track certificate
 	Unittitle string `json:"unit_title"`
 	Qualid string `json:"qual_identifier"`
@@ -31,7 +31,7 @@ type Cert struct{
 type Description struct{
 	Unittitle string `json:"unit_title"`
 	Qualid string `json:"qual_identifier"`
-  Certificate string `json:"cert_hash"`
+        Certificate string `json:"cert_hash"`
 }
 
 type AnOpenCert struct{
@@ -323,7 +323,7 @@ func (t *CertificateChaincode) find_cert(stub shim.ChaincodeStubInterface, args 
 		if err != nil {
 			return nil, errors.New("Failed to get Certificate")
 		}
-		res := Cert{}
+		res := cert{}
 		json.Unmarshal(certAsBytes, &res)										//un stringify it aka JSON.parse()
 
 
