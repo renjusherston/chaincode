@@ -19,7 +19,7 @@ type CertificateChaincode struct {
 var certIndexStr = "_certindex"				//name for the key/value that will store a list of all known certs
 var opentransStr = "_opentrans"				//name for the key/value that will store all certificates
 
-type cert struct{
+type Cert struct{
 	Owner string `json:"owner_name"`					//the fieldtags are needed to keep track certificate
 	Unittitle string `json:"unit_title"`
 	Qualid string `json:"qual_identifier"`
@@ -31,7 +31,7 @@ type cert struct{
 type Description struct{
 	Unittitle string `json:"unit_title"`
 	Qualid string `json:"qual_identifier"`
-        Certificate string `json:"cert_hash"`
+  Certificate string `json:"cert_hash"`
 }
 
 type AnOpenCert struct{
@@ -240,7 +240,7 @@ func (t *CertificateChaincode) init_cert(stub shim.ChaincodeStubInterface, args 
 
 	//build the cert json string manually
 	str := `{"owner": "` + owner + `", "unittitle": "` + unittitle + `", "qualid": "` + qualid + `", "unitid": "` + unitid + `", "user": "` + user + `", "certificate": "` + certificate + `"}`
-	err = stub.PutState(owner, []byte(str))									//store cert with id as key
+	err = stub.PutState(user, []byte(str))									//store cert with id as key
 	if err != nil {
 		return nil, err
 	}
@@ -254,7 +254,7 @@ func (t *CertificateChaincode) init_cert(stub shim.ChaincodeStubInterface, args 
 	json.Unmarshal(certsAsBytes, &certIndex)							//un stringify it aka JSON.parse()
 
 	//append
-	certIndex = append(certIndex, owner)									//add cert name to index list
+	certIndex = append(certIndex, user)									//add cert name to index list
 	fmt.Println("! cert index: ", certIndex)
 	jsonAsBytes, _ := json.Marshal(certIndex)
 	err = stub.PutState(certIndexStr, jsonAsBytes)						//store name of cert
@@ -323,7 +323,7 @@ func (t *CertificateChaincode) find_cert(stub shim.ChaincodeStubInterface, args 
 		if err != nil {
 			return nil, errors.New("Failed to get Certificate")
 		}
-		res := cert{}
+		res := Cert{}
 		json.Unmarshal(certAsBytes, &res)										//un stringify it aka JSON.parse()
 
 
