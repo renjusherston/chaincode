@@ -35,7 +35,7 @@ type Description struct{
 }
 
 type AnOpenCert struct{
-	Owner string `json:"owner_name"`					//user who created the open Cert order
+	Owner string `json:"owner_name"`					//user who created the Certificate
 	Timestamp int64 `json:"timestamp"`			//utc timestamp of creation
 	Want Description  `json:"want"`				//description of desired certificate
 	Willing []Description `json:"willing"`		//array of cert willing to generate certificate
@@ -118,7 +118,6 @@ func (t *CertificateChaincode) Invoke(stub shim.ChaincodeStubInterface, function
 		return t.init_cert(stub, args)
 	} else if function == "set_user" {										//change owner of a certificate
 		res, err := t.set_user(stub, args)
-		cleanTransactions(stub)													//lets make sure all open Transactions are still valid
 		return res, err
 	} else if function == "find_cert" {									//create a new transaction
 		return t.find_cert(stub, args)
@@ -187,7 +186,7 @@ func (t *CertificateChaincode) Write(stub shim.ChaincodeStubInterface, args []st
 }
 
 // ============================================================================================================================
-// Init cert - create a new cert, store into chaincode state
+// Init cert - create a new certificate, store into chaincode state
 // ============================================================================================================================
 func (t *CertificateChaincode) init_cert(stub shim.ChaincodeStubInterface, args []string) ([]byte, error) {
 	var err error
@@ -218,7 +217,7 @@ func (t *CertificateChaincode) init_cert(stub shim.ChaincodeStubInterface, args 
 	}
 
 
-	owner := args[0]
+	owner := strings.ToLower(args[0])
 	unittitle := strings.ToLower(args[1])
 	qualid := strings.ToLower(args[2])
 	unitid := strings.ToLower(args[3])
@@ -241,7 +240,7 @@ func (t *CertificateChaincode) init_cert(stub shim.ChaincodeStubInterface, args 
 
 	//build the cert json string manually
 	str := `{"owner": "` + owner + `", "unittitle": "` + unittitle + `", "qualid": "` + qualid + `", "unitid": "` + unitid + `", "user": "` + user + `", "certificate": "` + certificate + `"}`
-	err = stub.PutState(name, []byte(str))									//store cert with id as key
+	err = stub.PutState(owner, []byte(str))									//store cert with id as key
 	if err != nil {
 		return nil, err
 	}
@@ -255,7 +254,7 @@ func (t *CertificateChaincode) init_cert(stub shim.ChaincodeStubInterface, args 
 	json.Unmarshal(certsAsBytes, &certIndex)							//un stringify it aka JSON.parse()
 
 	//append
-	certIndex = append(certIndex, name)									//add cert name to index list
+	certIndex = append(certIndex, owner)									//add cert name to index list
 	fmt.Println("! cert index: ", certIndex)
 	jsonAsBytes, _ := json.Marshal(certIndex)
 	err = stub.PutState(certIndexStr, jsonAsBytes)						//store name of cert
@@ -265,7 +264,7 @@ func (t *CertificateChaincode) init_cert(stub shim.ChaincodeStubInterface, args 
 }
 
 // ============================================================================================================================
-// Set User Permission on cert
+// Set User Permission on certificate
 // ============================================================================================================================
 func (t *CertificateChaincode) set_user(stub shim.ChaincodeStubInterface, args []string) ([]byte, error) {
 	var err error
@@ -297,21 +296,22 @@ func (t *CertificateChaincode) set_user(stub shim.ChaincodeStubInterface, args [
 }
 
 // ============================================================================================================================
-// findcert - look for a matching cert that this user owns and return it
+// find certificate - look for a matching cert that this user owns and return it
 // ============================================================================================================================
 func (t *CertificateChaincode) find_cert(stub shim.ChaincodeStubInterface, args []string)([]byte, error){
-        var err error
+
+	var err error
 
 	if len(args) < 2 {
 		return nil, errors.New("Incorrect number of arguments. Expecting 2")
 	}
 
-	var fail cert;
-	fmt.Println("- start find Certificate")
-	fmt.Println("looking for " + args[0] + ", " + args[1]);
-
 	//get the cert index
 	certsAsBytes, err := stub.GetState(certIndexStr)
+
+	if err != nil {
+		return nil, errors.New("Failed to get certificate index")
+	}
 
 	var certIndex []string
 	json.Unmarshal(certsAsBytes, &certIndex)
@@ -321,7 +321,7 @@ func (t *CertificateChaincode) find_cert(stub shim.ChaincodeStubInterface, args 
 
 		certAsBytes, err := stub.GetState(certIndex[i])						//grab this cert
 		if err != nil {
-			return fail, errors.New("Failed to get Certificate")
+			return nil, errors.New("Failed to get Certificate")
 		}
 		res := cert{}
 		json.Unmarshal(certAsBytes, &res)										//un stringify it aka JSON.parse()
@@ -340,7 +340,7 @@ func (t *CertificateChaincode) find_cert(stub shim.ChaincodeStubInterface, args 
 	if err != nil {
 		return nil, err
 	}
-	
+
 	fmt.Println("- end find Certificate - error")
 
 	return nil, nil
