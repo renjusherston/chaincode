@@ -19,7 +19,7 @@ type CertificateChaincode struct {
 var certIndexStr = "_certindex"				//name for the key/value that will store a list of all known certs
 var opentransStr = "_opentrans"				//name for the key/value that will store all certificates
 
-type cert struct{
+type Cert struct{
 	Owner string `json:"owner_name"`					//the fieldtags are needed to keep track certificate
 	Unittitle string `json:"unit_title"`
 	Qualid string `json:"qual_identifier"`
@@ -31,7 +31,7 @@ type cert struct{
 type Description struct{
 	Unittitle string `json:"unit_title"`
 	Qualid string `json:"qual_identifier"`
-        Certificate string `json:"cert_hash"`
+  Certificate string `json:"cert_hash"`
 }
 
 type AnOpenCert struct{
@@ -230,7 +230,7 @@ func (t *CertificateChaincode) init_cert(stub shim.ChaincodeStubInterface, args 
 	if err != nil {
 		return nil, errors.New("Failed to get certificate")
 	}
-	res := cert{}
+	res := Cert{}
 	json.Unmarshal(certAsBytes, &res)
 	if res.Certificate == certificate{
 		fmt.Println("This certificate arleady exists: " + certificate)
@@ -281,7 +281,7 @@ func (t *CertificateChaincode) set_user(stub shim.ChaincodeStubInterface, args [
 	if err != nil {
 		return nil, errors.New("Failed to get thing")
 	}
-	res := cert{}
+	res := Cert{}
 	json.Unmarshal(certAsBytes, &res)										//un stringify it aka JSON.parse()
 	res.User = args[1]														//change the user
 
@@ -302,8 +302,8 @@ func (t *CertificateChaincode) find_cert(stub shim.ChaincodeStubInterface, args 
 
 	var err error
 
-	if len(args) < 2 {
-		return nil, errors.New("Incorrect number of arguments. Expecting 2")
+	if len(args) < 1 {
+		return nil, errors.New("Incorrect number of arguments. Expecting at least 1")
 	}
 
 	//get the cert index
@@ -323,17 +323,17 @@ func (t *CertificateChaincode) find_cert(stub shim.ChaincodeStubInterface, args 
 		if err != nil {
 			return nil, errors.New("Failed to get Certificate")
 		}
-		res := cert{}
+		res := Cert{}
 		json.Unmarshal(certAsBytes, &res)										//un stringify it aka JSON.parse()
 
 
 		//check for user && certificate
-		if strings.ToLower(res.User) == strings.ToLower(args[0]) && strings.ToLower(res.Certificate) == strings.ToLower(args[1]){
+		if strings.ToLower(res.User) == strings.ToLower(args[0]) || strings.ToLower(res.Certificate) == strings.ToLower(args[1]){
 			fmt.Println("found a Certificate issued by: " + res.Owner)
 			fmt.Println("! end find Certificate")
-			jsonAsBytes, _ := json.Marshal(res)
+		
 
-			err = stub.PutState(args[0], jsonAsBytes)								//rewrite the cert with id as key
+			return certAsBytes, nil
 
 		}
 	}
