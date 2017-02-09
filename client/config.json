@@ -1,0 +1,9 @@
+{
+    "network_id": "3982d649b6d6464a9bbaa45431fede4a",
+    "reg_peer": "vp0.us.blockchain.ibm.com:5002/registrar",
+    "block_peer": "vp0.us.blockchain.ibm.com:5002/chaincode",
+    "chaincode":"https://github.com/renjusherston/rvm-chaincode",
+    "chaincode_id":"2923ba5c034d924d42ae46a6ac3216d49c11974d6ffb854c7088ed10613001a3e1565b73ece35ffbda254e0357a6d707b40e1f49696c321011c20c1bd85083a9",
+    "REST_HOST":"localhost",
+    "REST_PORT":"8080"        
+}
