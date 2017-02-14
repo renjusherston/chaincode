@@ -127,24 +127,9 @@ func (t *CertificateChaincode) Invoke(stub shim.ChaincodeStubInterface, function
 }
 
 // ============================================================================================================================
-// Query - Our entry point for Queries
-// ============================================================================================================================
-func (t *CertificateChaincode) Query(stub shim.ChaincodeStubInterface, function string, args []string) ([]byte, error) {
-	fmt.Println("query is running " + function)
-
-	// Handle different functions
-	if function == "read" {													//read a variable
-		return t.read(stub, args)
-	}
-	fmt.Println("query did not find func: " + function)						//error
-
-	return nil, errors.New("Received unknown function query")
-}
-
-// ============================================================================================================================
 // Query - Our entry point for Quering certificates
 // ============================================================================================================================
-func (t *CertificateChaincode) Querycert(stub shim.ChaincodeStubInterface, function string, args []string) ([]byte, error) {
+func (t *CertificateChaincode) Query(stub shim.ChaincodeStubInterface, function string, args []string) ([]byte, error) {
 //	fmt.Println("query certificate is running " + function)
 
 	// Handle different functions
@@ -182,7 +167,7 @@ func (t *CertificateChaincode) Querycert(stub shim.ChaincodeStubInterface, funct
 
 
 		//check for user && certificate
-		if strings.ToLower(res.Certificate) == strings.ToLower(args[0]){
+		if strings.ToLower(res.Certificate) == strings.ToLower(args[0]) || strings.ToLower(res.User) == strings.ToLower(args[0]){
 			fmt.Println("found a Certificate issued by: " + res.Owner)
 			fmt.Println("! end find Certificate")
 
@@ -352,55 +337,6 @@ func (t *CertificateChaincode) set_user(stub shim.ChaincodeStubInterface, args [
 	}
 
 	fmt.Println("- end set user")
-	return nil, nil
-}
-
-// ============================================================================================================================
-// find certificate - look for a matching cert that this user owns and return it
-// ============================================================================================================================
-func (t *CertificateChaincode) find_cert(stub shim.ChaincodeStubInterface, args []string)([]byte, error){
-
-	var err error
-
-	if len(args) < 1 {
-		return nil, errors.New("Incorrect number of arguments. Expecting at least 1")
-	}
-
-	//get the cert index
-	certsAsBytes, err := stub.GetState(certIndexStr)
-
-	if err != nil {
-		return nil, errors.New("Failed to get certificate index")
-	}
-
-	var certIndex []string
-	json.Unmarshal(certsAsBytes, &certIndex)
-
-	for i:= range certIndex{
-
-		certAsBytes, err := stub.GetState(certIndex[i])						//grab this cert
-		if err != nil {
-			return nil, errors.New("Failed to get Certificate")
-		}
-		res := Cert{}
-		json.Unmarshal(certAsBytes, &res)
-
-
-		//check for user && certificate
-		if strings.ToLower(res.Certificate) == strings.ToLower(args[0]){
-			fmt.Println("found a Certificate issued by: " + res.Owner)
-			fmt.Println("! end find Certificate")
-
-			return certAsBytes, nil
-
-		}
-	}
-	if err != nil {
-		return nil, err
-	}
-
-	fmt.Println("- end find Certificate - error")
-
 	return nil, nil
 }
 
