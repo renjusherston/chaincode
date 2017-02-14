@@ -6,7 +6,8 @@
         <link rel="stylesheet" type="text/css" href="css/structure.css">
     </head>
     <body>
-        <p style="text-align:center"><img src="/images/logo.png" width="200" /></p>
+        <p style="text-align:center"><h1>VTCT Blockchain Prototype</h1></p>
+        <hr>
         <p style="text-align:center"><a href="/dashboard">Back to home</a></p>
         <hr>
         <p style="text-align:center; font-size: 15px; font-weight: bold;">Verify certificate</p> 
@@ -14,8 +15,8 @@
 
 
         <form method="post" action="/verifycert" id="uploadForm" encType="multipart/form-data">
-     
-      
+
+
             <table style="float: left; margin-left: 600px;">
                 <tr>
                     <td><strong>Verify Certificate</strong>   </td>
@@ -31,8 +32,48 @@
                 <tr>
                     <td></td><td><input type="submit" name="Verify" value="Verify"></td>
                 </tr>
+
+
             </table>              
         </form>
+        <br><br>
+        <table style="float: left; margin-left: 550px;">
+            <tr>
+                <td> 
+                    <hr>
+                    <% if (er) { %>
+                    <p style="text-align: center;color: red; font-weight: bold;">Invalid certificate or no ledger transaction found against user!</p>
+                    <% } else if(msg) { %>
+                    
+                    <p style="text-align: center;color: blue; font-weight: bold;">Valid Certificate or User entry found</strong>  </p>
+                   
+                    <table border='2' cellpadding='2' cellspacing='2' style='border: 5px;'>
+                      
+                        <tr>
+                            <td><strong>Certificate Owner: &nbsp;</strong></td><td><%= msg.owner %></td>
+                        </tr>
+                        <tr>
+                            <td><strong>Unit Title: &nbsp;</strong></td><td><%= msg.unittitle %></td>
+                        </tr>
+                        <tr>
+                            <td><strong>Qualification Id: &nbsp;</strong></td><td><%= msg.qualid %></td>
+                        </tr>
+                        <tr>
+                            <td><strong>Unit Id: &nbsp;</strong></td><td><%= msg.unitid %></td>
+                        </tr>
+                        <tr>
+                            <td><strong>Issued to: &nbsp;</strong></td><td><%= msg.user %></td>
+                        </tr>
+                        <tr>
+                            <td><strong>Certificate hash: &nbsp;</strong></td><td><%= msg.certificate %></td>
+                        </tr>
+                    </table>
+                    
+                     
+                       <% }  %>
+                </td>
+            </tr>
 
+        </table>           
     </body>
 </html>
