@@ -10,6 +10,8 @@
     <body>
 
         <p style="text-align:center"><img src="/images/logo.png" width="200" /></p>
+        
+         <p style="text-align:center"><a href="/dashboard">Back to home</a></p>
         <hr>
         <p style="text-align:center; font-size: 15px; font-weight: bold;">Create certificate</p> 
         <br><br>
@@ -30,10 +32,20 @@
                     <td><strong>Unit Identifier</strong>   </td><td><input type="text" size="50" name="unit_identifier"></td>
                 </tr>
                 <tr>
-                    <td><strong>User Name</strong></td><td><input type="text" size="50" name="username"></td>
+                    <td><strong>User Name</strong></td><td><input type="text" size="50" name="user_name"></td>
                 </tr>
                 <tr>
-                    <td></td><td><input type="submit" name="Generate" value="Generate" ></td>
+                    <td colspan="2"> <p style="text-align: right;"><input type="submit" name="Generate Certificate" value="Generate Certificate" ></p></td>
+                </tr>
+                <tr>
+                    <td colspan="2"> 
+                        <% if (er) { %>
+                        <p style="text-align: center;color: red; font-weight: bold;">Failed in generating block</p>
+                        <% } else if (msg) { %>   
+                        <p style="text-align: center;color: blue;">Success... Your block id is <strong><%= msg %></strong>  </p>
+                        <p style="text-align: center;color: blue;"><a href="/downloadfile">Click here</a> to Download your certificate</p>
+                        <% }  %>
+                    </td>
                 </tr>
             </table>
 
