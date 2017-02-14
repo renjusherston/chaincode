@@ -10,6 +10,7 @@ var path = require('path'),
 var http = require('http');
 var server = http.createServer(app);
 
+
 app.use(express.static(path.join(__dirname, 'public')));
 app.set('views', __dirname + '/views');
 app.engine('html', require('ejs').renderFile);
@@ -17,6 +18,7 @@ app.engine('html', require('ejs').renderFile);
 
 app.use(bodyParser.urlencoded({extended: true}));
 app.use(bodyParser.json());
+
 
 require('./app/routes.js')(app, server);
 
@@ -87,7 +89,7 @@ router.route('/regcertificate')
 router.route('/searchbycert')
         .post(function(req, res) {
 
-    var user_name = req.query.user_name;
+  
     var cert_hash = req.query.cert_hash;
 
 
@@ -102,7 +104,6 @@ router.route('/searchbycert')
             "ctorMsg": {
                 "function": "find_cert",
                 "args": [
-                    user_name,
                     cert_hash
                 ]
             },

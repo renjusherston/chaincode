@@ -13,22 +13,18 @@
         <hr>
         <fieldset>
 
-            <p style="text-align:center; font-size: 15px">Welcome to certificate management tool.</p> 
+            <p style="text-align:center; font-size: 15px">Welcome <strong><%- username %></strong> to certificate management tool.</p> 
             <br><br>
-            <p style="text-align:center;font-size: 15px">
+             <div id="bobox">
+            <span id="bbox"><strong><a href="/createcert">Create Certificate</a></strong></span>
+            <span id="bbox"><strong><a href="/verifycert">Verify Certificate</a></strong></span>
+            <span id="bbox"><strong><a href="/">Logout</a></strong></span>
 
-                <strong><a href="/createcert">Create Certificate</a></strong>
-                <br><br>
-
-                <strong><a href="/verifycert">Verify Certificate</a></strong>
-
-                <br><br>
-
-                <strong><a href="/">Logout</a></strong>
-                
-            </p>
+        </div>
+            
+            
         </fieldset>
-
+       
 
     </body>
 </html>

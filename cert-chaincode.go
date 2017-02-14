@@ -240,10 +240,13 @@ func (t *CertificateChaincode) init_cert(stub shim.ChaincodeStubInterface, args 
 
 	//build the cert json string manually
 	str := `{"owner": "` + owner + `", "unittitle": "` + unittitle + `", "qualid": "` + qualid + `", "unitid": "` + unitid + `", "user": "` + user + `", "certificate": "` + certificate + `"}`
-	err = stub.PutState(user, []byte(str))									//store cert with id as key
+	err = stub.PutState(user, []byte(str))									//store cert with user name as key
+
 	if err != nil {
 		return nil, err
 	}
+
+  //err1 = stub.PutState(certificate, []byte(str))									//store  with cert as key
 
 	//get the cert index
 	certsAsBytes, err := stub.GetState(certIndexStr)
@@ -317,21 +320,19 @@ func (t *CertificateChaincode) find_cert(stub shim.ChaincodeStubInterface, args 
 	json.Unmarshal(certsAsBytes, &certIndex)
 
 	for i:= range certIndex{
-		//fmt.Println("looking @ cert name: " + certIndex[i]);
 
 		certAsBytes, err := stub.GetState(certIndex[i])						//grab this cert
 		if err != nil {
 			return nil, errors.New("Failed to get Certificate")
 		}
 		res := Cert{}
-		json.Unmarshal(certAsBytes, &res)										//un stringify it aka JSON.parse()
+		json.Unmarshal(certAsBytes, &res)
 
 
 		//check for user && certificate
-		if strings.ToLower(res.User) == strings.ToLower(args[0]) || strings.ToLower(res.Certificate) == strings.ToLower(args[1]){
+		if strings.ToLower(res.Certificate) == strings.ToLower(args[0]){
 			fmt.Println("found a Certificate issued by: " + res.Owner)
 			fmt.Println("! end find Certificate")
-		
 
 			return certAsBytes, nil
 
