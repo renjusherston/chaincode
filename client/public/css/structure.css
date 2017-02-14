@@ -473,3 +473,12 @@ div#menu li.back .left {
     text-align: center;
     width: 100%;
 }
+
+h1 {
+  color: darkslategrey;
+    font-size: 44px;
+    padding-bottom: 25px;
+    padding-top: 25px;
+    text-align: center;
+    text-shadow: 1px 1px 2px black, 0 0 25px blue, 0 0 5px chartreuse;
+}

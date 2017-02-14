@@ -12,7 +12,7 @@ var fileUpload = require('express-fileupload');
 
 
 module.exports = function(app, passport, server) {
-app.use(fileUpload());
+    app.use(fileUpload());
     //login landing  
     app.get('/', function(req, resp) {
 
@@ -97,7 +97,7 @@ app.use(fileUpload());
         var hash = md5File.sync('./uploads/certificate.pdf');
         cert_hash = hash;
 
-        console.log('gen: '+cert_hash)
+        console.log('gen: ' + cert_hash)
 
         var options = {
             method: 'POST',
@@ -119,8 +119,23 @@ app.use(fileUpload());
     });
 
     //certificate verification landing screen
-    app.get('/verifycert', function(request, response) {
-        response.render('verifycert.html');
+    app.get('/verifycert', function(req, response) {
+        var er;
+        var respdata;
+        if (req.param("msg") && req.param("msg") != 'undefined') {
+            respdata = JSON.parse(req.param("msg"));
+        } else {
+            respdata = req.param("msg");
+        }
+        if (req.param("er")) {
+            er = req.param("er");
+        }
+        if(req.param("msg") == 'undefined'){
+            er=1;
+        }
+
+        response.render('verifycert.html', {er: er, msg: respdata});
+
     });
 
 //certificate verification handler
@@ -129,52 +144,53 @@ app.use(fileUpload());
         var certFile;
         var cert_hash;
         var user_name;
-         var options;
-
-        if (req.files) {
-            certFile = req.files.certificate;
-
-            
-            certFile.mv('./uploads/verify/certificate.pdf', function(err) {
-                if (err) {
-                    console.log(err);
-                }
-                else {
-                    console.log('File uploaded!');
-                }
-            });
-
-
-            /* hash certificate */
-            var hash = md5File.sync('./uploads/verify/certificate.pdf');
-            cert_hash = hash;
-
-            console.log('ver: '+cert_hash);
-
-        }
+        var options;
 
         user_name = req.body.user_name;
 
+        if (user_name) {
+            options = {
+                method: 'POST',
+                url: 'http://' + config.REST_HOST + ':' + config.REST_PORT + '/api/searchbyname?user_name=' + user_name
+            };
+        } else {
 
-        if(user_name){
-        options = {
-            method: 'POST',
-            url: 'http://' + config.REST_HOST + ':' + config.REST_PORT + '/api/searchbyname?user_name=' + user_name + '&cert_hash=' + cert_hash
-        };
-        }else{
-           options = {
-            method: 'POST',
-            url: 'http://' + config.REST_HOST + ':' + config.REST_PORT + '/api/searchbycert?cert_hash=' + cert_hash
-        };  
+            if (req.files) {
+                certFile = req.files.certificate;
+
+
+                if (certFile) {
+                    certFile.mv('./uploads/verify/certificate.pdf', function(err) {
+                        if (err) {
+                            console.log(err);
+                        }
+                        else {
+                            console.log('File uploaded!');
+                        }
+                    });
+
+
+                    /* hash certificate */
+                    var hash = md5File.sync('./uploads/verify/certificate.pdf');
+                    cert_hash = hash;
+
+                    console.log('ver: ' + cert_hash);
+                }
+            }
+
+            options = {
+                method: 'POST',
+                url: 'http://' + config.REST_HOST + ':' + config.REST_PORT + '/api/searchbycert?cert_hash=' + cert_hash
+            };
         }
         request(options, function(error, response, body) {
             if (!error) {
 
                 var resp = JSON.parse(body);
 
-              console.log(resp);
+                console.log(resp);
 
-                if (resp.message.OK) {
+                if (resp.message.result) {
                     res.redirect('/verifycert?msg=' + resp.message.result.message);
                 } else {
                     res.redirect('/verifycert?er=1');

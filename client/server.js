@@ -95,14 +95,14 @@ router.route('/searchbycert')
 
     var data = {
         "jsonrpc": "2.0",
-        "method": "invoke",
+        "method": "query",
         "params": {
             "type": 1,
             "chaincodeID": {
                 "name": config.chaincode_id
             },
             "ctorMsg": {
-                "function": "find_cert",
+                "function": "read",
                 "args": [
                     cert_hash
                 ]
