@@ -165,6 +165,7 @@ func (t *CertificateChaincode) Query(stub shim.ChaincodeStubInterface, function 
 		res := Cert{}
 		json.Unmarshal(certAsBytes, &res)
 
+    return certAsBytes, nil
 
 		//check for user && certificate
 		if strings.ToLower(res.Certificate) == strings.ToLower(args[0]) || strings.ToLower(res.User) == strings.ToLower(args[0]){
