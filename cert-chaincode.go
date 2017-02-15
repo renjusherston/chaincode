@@ -130,16 +130,17 @@ func (t *CertificateChaincode) Invoke(stub shim.ChaincodeStubInterface, function
 // Query - Our entry point for Quering certificates
 // ============================================================================================================================
 func (t *CertificateChaincode) Query(stub shim.ChaincodeStubInterface, function string, args []string) ([]byte, error) {
-//	fmt.Println("query certificate is running " + function)
+	fmt.Println("query certificate is running " + function)
 
 	// Handle different functions
-//	if function == "read" {													//read a variable
-//		return t.read(stub, args)
-//	}
-//	fmt.Println("query did not find func: " + function)						//error
+	if function == "read" {													//read a variable
+		return t.read(stub, args)
+	}
+	fmt.Println("query did not find func: " + function)						//error
 
-//	return nil, errors.New("Received unknown function query")
+	return nil, errors.New("Received unknown function query")
 
+/*
 	var err error
 
 	if len(args) < 1 {
@@ -165,7 +166,7 @@ func (t *CertificateChaincode) Query(stub shim.ChaincodeStubInterface, function 
 		res := Cert{}
 		json.Unmarshal(certAsBytes, &res)
 
-    
+
 
 		//check for user && certificate
 		if strings.ToLower(res.Certificate) == strings.ToLower(args[0]) || strings.ToLower(res.User) == strings.ToLower(args[0]){
@@ -183,6 +184,7 @@ func (t *CertificateChaincode) Query(stub shim.ChaincodeStubInterface, function 
 	fmt.Println("- end find Certificate - error")
 
 	return nil, nil
+	*/
 }
 
 // ============================================================================================================================
@@ -232,7 +234,7 @@ func (t *CertificateChaincode) Write(stub shim.ChaincodeStubInterface, args []st
 // ============================================================================================================================
 func (t *CertificateChaincode) init_cert(stub shim.ChaincodeStubInterface, args []string) ([]byte, error) {
 	var err error
-	//var err1 error
+
 
 	if len(args) != 6 {
 		return nil, errors.New("Incorrect number of arguments. Expecting 6")
@@ -289,7 +291,7 @@ func (t *CertificateChaincode) init_cert(stub shim.ChaincodeStubInterface, args 
 		return nil, err
 	}
 
-  //err1 = stub.PutState(certificate, []byte(str))									//store  with cert as key
+  err = stub.PutState(certificate, []byte(str))									//store  with cert as key
 
 	//get the cert index
 	certsAsBytes, err := stub.GetState(certIndexStr)
