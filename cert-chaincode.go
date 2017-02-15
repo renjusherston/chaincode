@@ -165,7 +165,7 @@ func (t *CertificateChaincode) Query(stub shim.ChaincodeStubInterface, function 
 		res := Cert{}
 		json.Unmarshal(certAsBytes, &res)
 
-    return certAsBytes, nil
+    
 
 		//check for user && certificate
 		if strings.ToLower(res.Certificate) == strings.ToLower(args[0]) || strings.ToLower(res.User) == strings.ToLower(args[0]){
@@ -297,7 +297,7 @@ func (t *CertificateChaincode) init_cert(stub shim.ChaincodeStubInterface, args 
 		return nil, errors.New("Failed to get cert index")
 	}
 	var certIndex []string
-	json.Unmarshal(certsAsBytes, &certIndex)							//un stringify it aka JSON.parse()
+	json.Unmarshal(certsAsBytes, &certIndex)							// JSON.parse()
 
 	//append
 	certIndex = append(certIndex, user)									//add cert name to index list
