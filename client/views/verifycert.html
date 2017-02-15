@@ -8,7 +8,7 @@
     <body>
         <p style="text-align:center"><h1>VTCT Blockchain Prototype</h1></p>
         <hr>
-        <p style="text-align:center"><a href="/dashboard">Back to home</a></p>
+        <h3><a href="/dashboard">Home</a> | <a href="/createcert">Create</a> | <a href="/">Logout</a></h3>
         <hr>
         <p style="text-align:center; font-size: 15px; font-weight: bold;">Verify certificate</p> 
         <br><br>
@@ -17,17 +17,17 @@
         <form method="post" action="/verifycert" id="uploadForm" encType="multipart/form-data">
 
 
-            <table style="float: left; margin-left: 600px;">
+            <table style="float: left; margin-left: 500px;">
                 <tr>
                     <td><strong>Verify Certificate</strong>   </td>
-                    <td><input type="file" name="certificate"></td>
+                    <td><input type="file" name="certificate" size="50"></td>
                 </tr>
                 <tr>
                     <td colspan="2" style="text-align: center">--Or--</td>
                 </tr>
                 <tr>
                     <td><strong>User Name</strong></td>
-                    <td><input type="text" name="user_name"></td>
+                    <td><input type="text" name="user_name" size="50"></td>
                 </tr>
                 <tr>
                     <td></td><td><input type="submit" name="Verify" value="Verify"></td>

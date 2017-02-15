@@ -6,7 +6,6 @@ var localStorage = require('localStorage');
 
 var pdf = require('html-pdf');
 var md5File = require('md5-file');
-
 var fileUpload = require('express-fileupload');
 
 
@@ -60,6 +59,19 @@ module.exports = function(app, passport, server) {
 
 
         res.download('./uploads/certificate.pdf');
+        /*
+         fs.stat('./uploads/certificate.pdf', function(err, stats) {
+         if (err) {
+         return console.error(err);
+         }
+         
+         fs.unlink('./uploads/certificate.pdf', function(err) {
+         if (err)
+         return console.log(err);
+         console.log('file deleted successfully');
+         });
+         });
+         */
     });
 
 //create certificate landing screen
@@ -88,6 +100,7 @@ module.exports = function(app, passport, server) {
 </html>";
         var options = {format: 'Letter'};
         pdf.create(html, options).toFile('./uploads/certificate.pdf', function(err, res) {
+
             if (err)
                 return console.log(err);
 
@@ -96,6 +109,7 @@ module.exports = function(app, passport, server) {
         /* hash certificate */
         var hash = md5File.sync('./uploads/certificate.pdf');
         cert_hash = hash;
+        localStorage.setItem("cert_hash", cert_hash);
 
         console.log('gen: ' + cert_hash)
 
@@ -130,8 +144,8 @@ module.exports = function(app, passport, server) {
         if (req.param("er")) {
             er = req.param("er");
         }
-        if(req.param("msg") == 'undefined'){
-            er=1;
+        if (req.param("msg") == 'undefined') {
+            er = 1;
         }
 
         response.render('verifycert.html', {er: er, msg: respdata});
@@ -172,7 +186,9 @@ module.exports = function(app, passport, server) {
 
                     /* hash certificate */
                     var hash = md5File.sync('./uploads/verify/certificate.pdf');
-                    cert_hash = hash;
+                    //cert_hash = hash;
+
+                    cert_hash = localStorage.getItem("cert_hash");
 
                     console.log('ver: ' + cert_hash);
                 }
