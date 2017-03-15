@@ -7,12 +7,12 @@ var localStorage = require('localStorage');
 var pdf = require('html-pdf');
 var md5File = require('md5-file');
 var fileUpload = require('express-fileupload');
-
+var pshell = require('python-shell');
 
 
 module.exports = function(app, passport, server) {
     app.use(fileUpload());
-    //login landing  
+    //login landing
     app.get('/', function(req, resp) {
 
         resp.render('login.html', {er: req.param("er")});
@@ -64,7 +64,7 @@ module.exports = function(app, passport, server) {
          if (err) {
          return console.error(err);
          }
-         
+
          fs.unlink('./uploads/certificate.pdf', function(err) {
          if (err)
          return console.log(err);
@@ -107,29 +107,47 @@ module.exports = function(app, passport, server) {
         });
 
         /* hash certificate */
-        var hash = md5File.sync('./uploads/certificate.pdf');
-        cert_hash = hash;
-        localStorage.setItem("cert_hash", cert_hash);
+      //  var hash = md5File.sync('./uploads/certificate.pdf');
 
-        console.log('gen: ' + cert_hash)
-
+        var hashfile ='uploads/certificate.pdf';
         var options = {
-            method: 'POST',
-            url: 'http://' + config.REST_HOST + ':' + config.REST_PORT + '/api/regcertificate?owner_name=' + owner_name + '&unit_title=' + unit_title + '&qual_identifier=' + qual_identifier + '&unit_identifier=' + unit_identifier + '&user_name=' + user_name + '&cert_hash=' + cert_hash
+          mode: 'text',
+          pythonOptions: ['-u'],
+          scriptPath: './',
+          args: [hashfile]
+      };
 
-        };
-        request(options, function(error, response, body) {
-            if (!error) {
-                var resp = JSON.parse(body);
+          var hash='';
+          pshell.run('fhash.py', options, function(err, results) {
+              if (err)
+                console.log({status: 'Failed'});
+              if (results) {
+                   hash = results.toString();
+                   cert_hash = hash;
+                   localStorage.setItem("cert_hash", cert_hash);
+
+                   console.log('gen: ' + cert_hash)
+
+                   var options = {
+                       method: 'POST',
+                       url: 'http://' + config.REST_HOST + ':' + config.REST_PORT + '/api/regcertificate?owner_name=' + owner_name + '&unit_title=' + unit_title + '&qual_identifier=' + qual_identifier + '&unit_identifier=' + unit_identifier + '&user_name=' + user_name + '&cert_hash=' + cert_hash
+
+                   };
+                   request(options, function(error, response, body) {
+                       if (!error) {
+                           var resp = JSON.parse(body);
 
 
-                if (resp.message.result.status) {
-                    res.redirect('/createcert?msg=' + resp.message.result.message);
-                } else {
-                    res.redirect('/createcert?er=1');
-                }
-            }
-        });
+                           if (resp.message.result.status) {
+                               res.redirect('/createcert?msg=' + resp.message.result.message);
+                           } else {
+                               res.redirect('/createcert?er=1');
+                           }
+                       }
+                   });
+              }
+          });
+
     });
 
     //certificate verification landing screen
@@ -185,38 +203,60 @@ module.exports = function(app, passport, server) {
 
 
                     /* hash certificate */
-                    var hash = md5File.sync('./uploads/verify/certificate.pdf');
+                    //var hash = md5File.sync('./uploads/verify/certificate.pdf');
                     //cert_hash = hash;
 
-                    cert_hash = localStorage.getItem("cert_hash");
+                    //cert_hash = localStorage.getItem("cert_hash");
 
-                    console.log('ver: ' + cert_hash);
+                    var hashfile ='uploads/verify/certificate.pdf';
+                    var options = {
+                      mode: 'text',
+                      pythonOptions: ['-u'],
+                      scriptPath: './',
+                      args: [hashfile]
+                  };
+
+                      var hash='';
+                      pshell.run('fhash.py', options, function(err, results) {
+                          if (err)
+                            console.log({status: 'Failed'});
+                          if (results) {
+                               hash = results.toString();
+
+                               cert_hash = hash;
+                               console.log('ver: ' + cert_hash);
+
+                               options = {
+                                   method: 'POST',
+                                   url: 'http://' + config.REST_HOST + ':' + config.REST_PORT + '/api/searchbycert?cert_hash=' + cert_hash
+                               };
+                               request(options, function(error, response, body) {
+                                   if (!error) {
+
+                                       var resp = JSON.parse(body);
+
+                                       console.log(resp);
+
+                                       if (resp.message.result) {
+                                           res.redirect('/verifycert?msg=' + resp.message.result.message);
+                                       } else {
+                                           res.redirect('/verifycert?er=1');
+                                       }
+                                   } else {
+                                       console.log({message: error});
+                                       res.redirect('/verifycert?er=1');
+                                   }
+                               });
+                          }
+                      });
+
+
                 }
             }
 
-            options = {
-                method: 'POST',
-                url: 'http://' + config.REST_HOST + ':' + config.REST_PORT + '/api/searchbycert?cert_hash=' + cert_hash
-            };
+
         }
-        request(options, function(error, response, body) {
-            if (!error) {
 
-                var resp = JSON.parse(body);
-
-                console.log(resp);
-
-                if (resp.message.result) {
-                    res.redirect('/verifycert?msg=' + resp.message.result.message);
-                } else {
-                    res.redirect('/verifycert?er=1');
-                }
-            } else {
-                console.log({message: error});
-                res.redirect('/verifycert?er=1');
-            }
-        });
     });
-
 
 };
