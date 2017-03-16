@@ -60,10 +60,6 @@ module.exports = function(app, passport, server) {
 
         res.download('./uploads/certificate.pdf');
         /*
-         fs.stat('./uploads/certificate.pdf', function(err, stats) {
-         if (err) {
-         return console.error(err);
-         }
 
          fs.unlink('./uploads/certificate.pdf', function(err) {
          if (err)
@@ -121,12 +117,12 @@ module.exports = function(app, passport, server) {
           pshell.run('fhash.py', options, function(err, results) {
               if (err)
                 console.log({status: 'Failed'});
+
               if (results) {
                    hash = results.toString();
-                   cert_hash = hash;
-                   localStorage.setItem("cert_hash", cert_hash);
+                   localStorage.setItem("cert_hash", hash);
 
-                   console.log('gen: ' + cert_hash)
+                   console.log('gen: ' + hash)
 
                    var options = {
                        method: 'POST',
@@ -194,13 +190,16 @@ module.exports = function(app, passport, server) {
                     console.log(resp);
 
                     if (resp.message.result) {
-                        res.redirect('/verifycert?msg=' + resp.message.result.message);
+                      //  res.redirect('/verifycert?msg=' + resp.message.result.message);
+                        response.render('verifycert.html', {msg: resp.message.result.message});
                     } else {
-                        res.redirect('/verifycert?er=1');
+                        //res.redirect('/verifycert?er=1');
+                        response.render('verifycert.html', {er: 1});
                     }
                 } else {
                     console.log({message: error});
-                    res.redirect('/verifycert?er=1');
+                    //res.redirect('/verifycert?er=1');
+                    response.render('verifycert.html', {er: 1});
                 }
             });
         } else {
@@ -241,12 +240,12 @@ module.exports = function(app, passport, server) {
                           if (results) {
                                hash = results.toString();
 
-                               cert_hash = hash;
-                               console.log('ver: ' + cert_hash);
+
+                               console.log('ver: ' + hash);
 
                                options = {
                                    method: 'POST',
-                                   url: 'http://' + config.REST_HOST + ':' + config.REST_PORT + '/api/searchbycert?cert_hash=' + cert_hash
+                                   url: 'http://' + config.REST_HOST + ':' + config.REST_PORT + '/api/searchbycert?cert_hash=' + hash
                                };
                                request(options, function(error, response, body) {
                                    if (!error) {
@@ -256,13 +255,16 @@ module.exports = function(app, passport, server) {
                                        console.log(resp);
 
                                        if (resp.message.result) {
-                                           res.redirect('/verifycert?msg=' + resp.message.result.message);
+                                           //res.redirect('/verifycert?msg=' + resp.message.result.message);
+                                           response.render('verifycert.html', {msg: resp.message.result.message});
                                        } else {
-                                           res.redirect('/verifycert?er=1');
+                                           //res.redirect('/verifycert?er=1');
+                                           response.render('verifycert.html', {er: 1});
                                        }
                                    } else {
                                        console.log({message: error});
-                                       res.redirect('/verifycert?er=1');
+                                       //res.redirect('/verifycert?er=1');
+                                       response.render('verifycert.html', {er: 1});
                                    }
                                });
                           }
