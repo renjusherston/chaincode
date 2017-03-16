@@ -182,7 +182,7 @@ module.exports = function(app, passport, server) {
                 url: 'http://' + config.REST_HOST + ':' + config.REST_PORT + '/api/searchbyname?user_name=' + user_name
             };
 
-            request(options, function(error, res, body) {
+            request(options, function(error, response, body) {
                 if (!error) {
 
                     var resp = JSON.parse(body);
@@ -190,16 +190,16 @@ module.exports = function(app, passport, server) {
                     console.log(resp);
 
                     if (resp.message.result) {
-                      //  res.redirect('/verifycert?msg=' + resp.message.result.message);
-                        res.render('verifycert.html', {msg: resp.message.result.message});
+                        res.redirect('/verifycert?msg=' + resp.message.result.message);
+                        
                     } else {
-                        //res.redirect('/verifycert?er=1');
-                        res.render('verifycert.html', {er: 1});
+                        res.redirect('/verifycert?er=1');
+
                     }
                 } else {
                     console.log({message: error});
-                    //res.redirect('/verifycert?er=1');
-                    res.render('verifycert.html', {er: 1});
+                    res.redirect('/verifycert?er=1');
+
                 }
             });
         } else {
@@ -247,7 +247,7 @@ module.exports = function(app, passport, server) {
                                    method: 'POST',
                                    url: 'http://' + config.REST_HOST + ':' + config.REST_PORT + '/api/searchbycert?cert_hash=' + hash
                                };
-                               request(options, function(error, res, body) {
+                               request(options, function(error, response, body) {
                                    if (!error) {
 
                                        var resp = JSON.parse(body);
@@ -255,16 +255,13 @@ module.exports = function(app, passport, server) {
                                        console.log(resp);
 
                                        if (resp.message.result) {
-                                           //res.redirect('/verifycert?msg=' + resp.message.result.message);
-                                           res.render('verifycert.html', {msg: resp.message.result.message});
+                                           res.redirect('/verifycert?msg=' + resp.message.result.message);
                                        } else {
-                                           //res.redirect('/verifycert?er=1');
-                                           res.render('verifycert.html', {er: 1});
+                                           res.redirect('/verifycert?er=1');
                                        }
                                    } else {
                                        console.log({message: error});
-                                       //res.redirect('/verifycert?er=1');
-                                       res.render('verifycert.html', {er: 1});
+                                       res.redirect('/verifycert?er=1');
                                    }
                                });
                           }
