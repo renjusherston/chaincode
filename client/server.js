@@ -195,5 +195,5 @@ function http_post(post_url, block_data, res) {
 
 //start the server
 
-app.listen(port);
+app.listen(port1);
 console.log('Rest server started on port ' + port1);
