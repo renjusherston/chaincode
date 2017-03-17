@@ -29,7 +29,7 @@ var blockurl = 'https://' + config.network_id + '-' + config.block_peer;
 // this will let us get the data from a POST
 
 
-var port = process.env.PORT || config.REST_PORT;        // set our port
+var port1 = process.env.PORT || config.REST_PORT;        // set our port
 
 //router
 
@@ -196,4 +196,4 @@ function http_post(post_url, block_data, res) {
 //start the server
 
 app.listen(port);
-console.log('Rest server started on port ' + port);
+console.log('Rest server started on port ' + port1);
