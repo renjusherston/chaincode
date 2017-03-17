@@ -9,7 +9,7 @@ var path = require('path'),
         fs = require('fs');
 var http = require('http');
 var server = http.createServer(app);
-
+var https = require('https');
 
 app.use(express.static(path.join(__dirname, 'public')));
 app.set('views', __dirname + '/views');
@@ -181,7 +181,7 @@ function http_post(post_url, block_data, res) {
         json: block_data
 
     };
-    request(options, function(error, response, body) {
+    https.request(options, function(error, response, body) {
         if (!error) {
             res.json({message: body});
 
