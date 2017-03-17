@@ -175,6 +175,7 @@ function http_post(post_url, block_data, res) {
     var options = {
         method: 'POST',
         url: post_url,
+        port: 443,
         headers: {
             'Content-Type': 'application/json'
         },
