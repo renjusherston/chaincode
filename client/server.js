@@ -175,14 +175,13 @@ function http_post(post_url, block_data, res) {
     var options = {
         method: 'POST',
         url: post_url,
-        port: 443,
         headers: {
             'Content-Type': 'application/json'
         },
         json: block_data
 
     };
-    https.request(options, function(error, response, body) {
+    request(options, function(error, response, body) {
         if (!error) {
             res.json({message: body});
 
