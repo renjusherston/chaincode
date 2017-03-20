@@ -277,6 +277,11 @@ module.exports = function(app, passport, server) {
 
     });
 
+      app.get('/logout', function(req, response) {
+        localStorage.setItem("user", '');
+        res.redirect('/');
+      });
+
     function authcheck(res){
       if(!localStorage.getItem("user")){
         res.redirect('/');

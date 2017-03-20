@@ -11,10 +11,10 @@
 
         <p style="text-align:center"><h1>VTCT Blockchain Prototype</h1></p>
         <hr>
-        
-         <h3><a href="/dashboard">Home</a> | <a href="/verifycert">Verify</a> | <a href="/">Logout</a></h3> 
+
+         <h3><a href="/dashboard">Home</a> | <a href="/verifycert">Verify</a> | <a href="/logout">Logout</a></h3> 
         <hr>
-        <p style="text-align:center; font-size: 15px; font-weight: bold;">Create certificate</p> 
+        <p style="text-align:center; font-size: 15px; font-weight: bold;">Create certificate</p>
         <br><br>
 
 
@@ -39,10 +39,10 @@
                     <td colspan="2"> <p style="text-align: right;"><input type="submit" name="Generate Certificate" value="Generate Certificate" ></p></td>
                 </tr>
                 <tr>
-                    <td colspan="2"> 
+                    <td colspan="2">
                         <% if (er) { %>
                         <p style="text-align: center;color: red; font-weight: bold;">Failed in generating block</p>
-                        <% } else if (msg) { %>   
+                        <% } else if (msg) { %>
                         <p style="text-align: center;color: blue;">Success... Your block id is <strong><%= msg %></strong>  </p>
                         <p style="text-align: center;color: blue;"><a href="/downloadfile">Click here</a> to Download your certificate</p>
                         <% }  %>
