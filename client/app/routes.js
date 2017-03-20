@@ -60,8 +60,6 @@ module.exports = function(app, passport, server) {
 
         res.download('./uploads/certificate.pdf');
 
-        res.redirect('/dashboard');
-
 
     });
 
@@ -100,10 +98,13 @@ module.exports = function(app, passport, server) {
 </body>\n\
 </html>";
         var options = {format: 'Letter'};
-        pdf.create(html, options).toFile('./uploads/certificate.pdf', function(err, res) {
+        pdf.create(html, options).toFile('./uploads/certificate.pdf', function(err, res1) {
 
             if (err)
                 return console.log(err);
+
+                /* hash certificate */
+              //  var hash = md5File.sync('./uploads/certificate.pdf');
 
                 var hashfile ='uploads/certificate.pdf';
                 var options = {
@@ -141,9 +142,9 @@ module.exports = function(app, passport, server) {
                       }
                   });
 
-
-
         });
+
+
 
     });
 
