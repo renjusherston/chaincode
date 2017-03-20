@@ -271,4 +271,11 @@ module.exports = function(app, passport, server) {
 
     });
 
+    function authcheck(){
+      if(!localStorage.getItem("user")){
+        res.redirect('/verifycert?er=1');
+      }
+
+    }
+
 };
