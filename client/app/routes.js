@@ -59,15 +59,10 @@ module.exports = function(app, passport, server) {
 
 
         res.download('./uploads/certificate.pdf');
-        /*
 
-         fs.unlink('./uploads/certificate.pdf', function(err) {
-         if (err)
-         return console.log(err);
-         console.log('file deleted successfully');
-         });
-         });
-         */
+        res.redirect('/dashboard');
+
+
     });
 
 //create certificate landing screen
@@ -80,6 +75,13 @@ module.exports = function(app, passport, server) {
 
 //create certificate handler
     app.post('/createcert', function(req, res) {
+
+      fs.unlink('./uploads/certificate.pdf', function(err) {
+      if (err)
+      return console.log(err);
+      console.log('file deleted successfully');
+      });
+
         var owner_name = req.body.owner_name;
         var unit_title = req.body.unit_title;
         var qual_identifier = req.body.qual_identifier;
@@ -103,46 +105,45 @@ module.exports = function(app, passport, server) {
             if (err)
                 return console.log(err);
 
+                var hashfile ='uploads/certificate.pdf';
+                var options = {
+                  mode: 'text',
+                  pythonOptions: ['-u'],
+                  scriptPath: './',
+                  args: [hashfile]
+              };
+
+                  var hash='';
+                  pshell.run('fhash.py', options, function(err, results) {
+                      if (err)
+                        console.log({status: 'Failed'});
+
+                      if (results) {
+                           hash = results.toString();
+
+                           var options = {
+                               method: 'POST',
+                               url: 'http://' + config.REST_HOST + ':' + config.REST_PORT + '/api/regcertificate?owner_name=' + owner_name + '&unit_title=' + unit_title + '&qual_identifier=' + qual_identifier + '&unit_identifier=' + unit_identifier + '&user_name=' + user_name + '&cert_hash=' + hash
+
+                           };
+                           request(options, function(error, response, body) {
+                               if (!error) {
+                                   var resp = JSON.parse(body);
+
+
+                                   if (resp.message.result.status) {
+                                       res.redirect('/createcert?msg=' + resp.message.result.message);
+                                   } else {
+                                       res.redirect('/createcert?er=1');
+                                   }
+                               }
+                           });
+                      }
+                  });
+
+
+
         });
-
-        /* hash certificate */
-      //  var hash = md5File.sync('./uploads/certificate.pdf');
-
-        var hashfile ='uploads/certificate.pdf';
-        var options = {
-          mode: 'text',
-          pythonOptions: ['-u'],
-          scriptPath: './',
-          args: [hashfile]
-      };
-
-          var hash='';
-          pshell.run('fhash.py', options, function(err, results) {
-              if (err)
-                console.log({status: 'Failed'});
-
-              if (results) {
-                   hash = results.toString();
-
-                   var options = {
-                       method: 'POST',
-                       url: 'http://' + config.REST_HOST + ':' + config.REST_PORT + '/api/regcertificate?owner_name=' + owner_name + '&unit_title=' + unit_title + '&qual_identifier=' + qual_identifier + '&unit_identifier=' + unit_identifier + '&user_name=' + user_name + '&cert_hash=' + hash
-
-                   };
-                   request(options, function(error, response, body) {
-                       if (!error) {
-                           var resp = JSON.parse(body);
-
-
-                           if (resp.message.result.status) {
-                               res.redirect('/createcert?msg=' + resp.message.result.message);
-                           } else {
-                               res.redirect('/createcert?er=1');
-                           }
-                       }
-                   });
-              }
-          });
 
     });
 
