@@ -49,7 +49,7 @@ module.exports = function(app, passport, server) {
 
 //dashboard landing
     app.get('/dashboard', function(request, response) {
-        this.authcheck(response);
+        authcheck(response);
         response.render('dashboard.html', {username: localStorage.getItem("user")});
 
     });
@@ -73,7 +73,7 @@ module.exports = function(app, passport, server) {
 //create certificate landing screen
     app.get('/createcert', function(req, response) {
 
-        this.authcheck(response);
+        authcheck(response);
 
         response.render('createcert.html', {er: req.param("er"), msg: req.param("msg")});
     });
@@ -149,7 +149,7 @@ module.exports = function(app, passport, server) {
     //certificate verification landing screen
     app.get('/verifycert', function(req, response) {
 
-      this.authcheck(response);
+      authcheck(response);
 
         var er;
         var respdata;
