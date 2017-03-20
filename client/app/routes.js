@@ -279,7 +279,7 @@ module.exports = function(app, passport, server) {
 
       app.get('/logout', function(req, response) {
         localStorage.setItem("user", '');
-        res.redirect('/');
+        response.redirect('/');
       });
 
     function authcheck(res){
