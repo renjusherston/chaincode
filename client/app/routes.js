@@ -120,13 +120,10 @@ module.exports = function(app, passport, server) {
 
               if (results) {
                    hash = results.toString();
-                   localStorage.setItem("cert_hash", hash);
-
-                   console.log('gen: ' + hash)
 
                    var options = {
                        method: 'POST',
-                       url: 'http://' + config.REST_HOST + ':' + config.REST_PORT + '/api/regcertificate?owner_name=' + owner_name + '&unit_title=' + unit_title + '&qual_identifier=' + qual_identifier + '&unit_identifier=' + unit_identifier + '&user_name=' + user_name + '&cert_hash=' + cert_hash
+                       url: 'http://' + config.REST_HOST + ':' + config.REST_PORT + '/api/regcertificate?owner_name=' + owner_name + '&unit_title=' + unit_title + '&qual_identifier=' + qual_identifier + '&unit_identifier=' + unit_identifier + '&user_name=' + user_name + '&cert_hash=' + hash
 
                    };
                    request(options, function(error, response, body) {
@@ -191,7 +188,7 @@ module.exports = function(app, passport, server) {
 
                     if (resp.message.result) {
                         res.redirect('/verifycert?msg=' + resp.message.result.message);
-                        
+
                     } else {
                         res.redirect('/verifycert?er=1');
 
@@ -239,8 +236,6 @@ module.exports = function(app, passport, server) {
                             console.log({status: 'Failed'});
                           if (results) {
                                hash = results.toString();
-
-
                                console.log('ver: ' + hash);
 
                                options = {
