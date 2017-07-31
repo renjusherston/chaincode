@@ -9,7 +9,7 @@ var path = require('path'),
         fs = require('fs');
 var http = require('http');
 var server = http.createServer(app);
-
+var https = require('https');
 
 app.use(express.static(path.join(__dirname, 'public')));
 app.set('views', __dirname + '/views');
@@ -89,7 +89,7 @@ router.route('/regcertificate')
 router.route('/searchbycert')
         .post(function(req, res) {
 
-  
+
     var cert_hash = req.query.cert_hash;
 
 
